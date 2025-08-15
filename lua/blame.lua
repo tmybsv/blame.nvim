@@ -41,7 +41,7 @@ local function show()
 		end
 	end
 	if not atime then return end
-	local msg = string.format("  %s • %s • %s", author, reltime(atime), summary)
+	local msg = string.format("%s %s %s", author, reltime(atime), summary)
 	clear()
 	vim.api.nvim_buf_set_extmark(0, ns, lnum - 1, 0, {
 		virt_text = { { msg, "BlameVirtText" } },
@@ -57,6 +57,15 @@ end
 
 function M.setup()
 	vim.api.nvim_set_hl(0, "BlameVirtText", { link = "Comment" })
+	vim.api.nvim_create_autocmd({ "CursorHold", "BufEnter", "TextChanged", "InsertLeave" }, {
+		callback = function()
+			if timer then
+				timer:stop(); timer:close(); timer = nil
+			end
+			timer = vim.loop.new_timer()
+			timer:start(50, 0, vim.schedule_wrap(show))
+		end
+	})
 	vim.api.nvim_create_user_command("BlameToggle", M.toggle, {})
 end
 
