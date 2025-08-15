@@ -1,1 +1,1 @@
-![./blame.png]
+![blame](./blame.png)
